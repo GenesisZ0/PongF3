@@ -64,7 +64,7 @@ class Tableau1 extends Phaser.Scene{
         this.physics.add.collider(this.balle, this.bas)
         this.physics.add.collider(this.balle, this.haut)
 
-        this.balle.setMaxVelocity(this.maxspeed,this.maxspeed)
+        this.balle.setMaxVelocity(1000)
 
         this.physics.add.collider(this.haut, this.player1)
         this.physics.add.collider(this.bas, this.player1)
