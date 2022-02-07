@@ -5,84 +5,105 @@ class Tableau1 extends Phaser.Scene{
     preload(){
         this.load.image('square','assets/carre.png');
         this.load.image('circle','assets/cercle.png');
-        this.load.image('barre','assets/barre.png');
-        this.load.image('bg','assets/ville.png');
+
+
     }
 
     create(){
 
 
-        this.hauteur = 500
-        this.largeur = 1000
-        this.speedX = 0
-        while(this.speedX===0){
-            this.speedX = 500*Phaser.Math.Between(-1,1)
+        this.hauteur = 800
+        this.largeur = 800
+        this.speedY = 0
+        while(this.speedY===0){
+            this.speedY = 500*Phaser.Math.Between(-1,1)
         }
         this.speedY = Phaser.Math.Between(-500, 500)
         this.maxspeed = 500
 
-        this.bg = this.add.image(0,0,'bg').setOrigin(0,0)
-        this.bg.setAlpha(0.4)
+
 
         this.balle = this.physics.add.sprite(this.largeur/2, this.hauteur/2, 'circle')
         this.balle.setDisplaySize(20, 20)
         this.balle.body.setBounce(1,1);
         this.balle.body.setAllowGravity(false)
 
+
         this.haut = this.physics.add.sprite(0, 0, 'square').setOrigin(0, 0)
         this.haut.setDisplaySize(this.largeur, 20)
         this.haut.body.setAllowGravity(false)
         this.haut.setImmovable(true);
-        this.barre = this.add.image(0,0,'barre').setOrigin(0,0)
-        this.bas = this.physics.add.sprite(0, 480, 'square').setOrigin(0, 0)
-        this.bas.setDisplaySize(this.largeur, 20)
-        this.bas.body.setAllowGravity(false)
-        this.bas.setImmovable(true);
-        this.barreB = this.add.image(0,this.hauteur-20,'barre').setOrigin(0,0)
 
 
 
-        this.player1 = this.physics.add.sprite(50, 360, 'square')
-        this.player1.setDisplaySize(20, 100)
+
+        this.gauche = this.physics.add.sprite(0, 0, 'square').setOrigin(0, 0)
+        this.gauche.setDisplaySize(20, this.largeur)
+        this.gauche.body.setAllowGravity(false)
+        this.gauche.setImmovable(true);
+
+        this.droite = this.physics.add.sprite(780, 0, 'square').setOrigin(0, 0)
+        this.droite.setDisplaySize(20, this.largeur)
+        this.droite.body.setAllowGravity(false)
+        this.droite.setImmovable(true);
+
+
+
+        for (let y = 5; y < 10; y++) {
+            for (let x = 2; x < 11; x++) {
+
+                let mabriquedumoment = this.physics.add.sprite(x* 62 , y* 32, 'square').setOrigin(0, 0)
+                mabriquedumoment.setDisplaySize(60, 30)
+                mabriquedumoment.body.setAllowGravity(false)
+                console.log('test')
+
+                mabriquedumoment.body.setAllowGravity(false)
+                mabriquedumoment.setImmovable(true)
+                this.physics.add.collider(this.balle,mabriquedumoment, function(){
+                    mabriquedumoment.destroy(true);
+                    this.scoreplayer1 += 1
+                });
+
+
+            }
+        }
+
+
+        this.player1 = this.physics.add.sprite(this.largeur/2, this.hauteur/1.1, 'square')
+        this.player1.setDisplaySize(200, 20)
         this.player1.body.setAllowGravity(false)
-        this.player2 = this.physics.add.sprite(920, 360, 'square')
-        this.player2.setDisplaySize(20, 100)
-        this.player2.body.setAllowGravity(false)
         this.player1.setImmovable(true)
-        this.player2.setImmovable(true)
+
 
         let me = this;
         this.physics.add.collider(this.player1, this.balle,function(){
             console.log('touche player 1')
             me.rebond(me.player1)
         })
-        this.physics.add.collider(this.player2, this.balle,function(){
-            console.log('touche player 2')
-            me.rebond(me.player2)
-        })
 
-        this.physics.add.collider(this.balle, this.bas)
+
+
         this.physics.add.collider(this.balle, this.haut)
+        this.physics.add.collider(this.balle, this.gauche)
+        this.physics.add.collider(this.balle, this.droite)
 
         this.balle.setMaxVelocity(1000)
 
         this.physics.add.collider(this.haut, this.player1)
-        this.physics.add.collider(this.bas, this.player1)
 
-        this.physics.add.collider(this.haut, this.player2)
-        this.physics.add.collider(this.bas, this.player2)
+
 
         this.player1Speed = 0
-        this.player2Speed = 0
 
-        if(this.balle<0)
+
+        if(this.balle< 0)
         {
             this.scoreplayer2 +=1;
             this.textplayer1.setText('Player 1 = ' + this.scoreplayer1);
 
         }
 
-        if(this.balle>this.largeur)
+        if(this.balle> 0)
         {
             this.scoreplayer1  +=1;
             this.textplayer2.setText('Player 2 = ' + this.scoreplayer2);
@@ -97,28 +118,26 @@ class Tableau1 extends Phaser.Scene{
         this.initKeyboard()
     }
 
-    rebond(players){
-        let me = this ;
-        console.log(this.player1.y);
-        console.log(me.balle.y);
-        let hauteurPlayers = players.displayHeight;
+    rebond(raquette){
 
-        let positionRelativePlayers = (this.balle.y - players.y);
+        let hauteurRaquette = raquette.displayWidth;
 
-        positionRelativePlayers= (positionRelativePlayers / hauteurPlayers)
-        positionRelativePlayers = positionRelativePlayers*2-1;
+        let positionRelativeRaquette =(this.balle.x-this.player1.x);
 
-        this.balle.setVelocityY(this.balle.body.velocity.y + positionRelativePlayers * 50);
+        positionRelativeRaquette = (positionRelativeRaquette/hauteurRaquette);
 
+        positionRelativeRaquette = (positionRelativeRaquette*2-1);
+
+        this.balle.setVelocityX( this.balle.body.velocity.x + positionRelativeRaquette * hauteurRaquette)
     }
 
     balleAucentre(){
-        this.balle.x = this.largeur/2
-        this.balle.y = this.hauteur/2
+        this.balle.y = this.largeur/2
+        this.balle.X = this.hauteur/2
         this.speedX = 0
 
-        this.balle.setVelocityX(Math.random()>0.5?-100:100)
-        this.balle.setVelocityY(0)
+        this.balle.setVelocityY(Math.random()>0.5?-100:100)
+        this.balle.setVelocityX(0)
     }
 
     /**
@@ -133,48 +152,38 @@ class Tableau1 extends Phaser.Scene{
     }
 
     update(){
-        if(this.balle.x>this.largeur){
-            this.win(this.joueurGauche);
+        if(this.balle.Y> -800){
+            this.balleAucentre()
         }
-        if(this.balle.x<0){
-            this.win(this.joueurDroite);
+        if(this.balle.Y< -800){
+            this.balleAucentre()
         }
-        this.player1.y += this.player1Speed
-        this.player2.y += this.player2Speed
+        this.player1.x += this.player1Speed
+
     }
 
     initKeyboard(){
         let me = this
         this.input.keyboard.on('keydown', function (kevent) {
             switch (kevent.keyCode) {
-                case Phaser.Input.Keyboard.KeyCodes.S:
-                    me.player1Speed = -5
-                    break;
-                case Phaser.Input.Keyboard.KeyCodes.X:
+                case Phaser.Input.Keyboard.KeyCodes.RIGHT:
                     me.player1Speed = 5
                     break;
-                case Phaser.Input.Keyboard.KeyCodes.J:
-                    me.player2Speed = -5
+                case Phaser.Input.Keyboard.KeyCodes.LEFT:
+                    me.player1Speed = -5
                     break;
-                case Phaser.Input.Keyboard.KeyCodes.N:
-                    me.player2Speed = 5
-                    break;
+
             }
         });
         this.input.keyboard.on('keyup', function (kevent) {
             switch (kevent.keyCode) {
-                case Phaser.Input.Keyboard.KeyCodes.S:
+                case Phaser.Input.Keyboard.KeyCodes.LEFT:
                     me.player1Speed = 0
                     break;
-                case Phaser.Input.Keyboard.KeyCodes.X:
+                case Phaser.Input.Keyboard.KeyCodes.RIGHT:
                     me.player1Speed = 0
                     break;
-                case Phaser.Input.Keyboard.KeyCodes.J:
-                    me.player2Speed = 0
-                    break;
-                case Phaser.Input.Keyboard.KeyCodes.N:
-                    me.player2Speed = 0
-                    break;
+
             }
         });
     }
