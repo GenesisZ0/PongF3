@@ -152,12 +152,16 @@ class Tableau1 extends Phaser.Scene{
     }
 
     update(){
-        if(this.balle.Y> -800){
+        if(this.balle.y > 800){
             this.balleAucentre()
         }
-        if(this.balle.Y< -800){
-            this.balleAucentre()
+        if (this.player1.x > 680 ) {
+            this.player1.x = 680
         }
+        if (this.player1.x < 120 ) {
+            this.player1.x = 120
+        }
+
         this.player1.x += this.player1Speed
 
     }
